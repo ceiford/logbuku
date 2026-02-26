@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logbuku · Tampilkan Tanggal</title>
+    <!-- html2pdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background: #fef7e9;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+            padding: 2rem 1rem;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 1000px;
+            width: 100%;
+            background: #ffffffdf;
+            backdrop-filter: blur(2px);
+            border-radius: 2.5rem;
+            box-shadow: 0 20px 40px rgba(10, 47, 68, 0.15);
+            padding: 2rem 2.2rem 2.8rem;
+            border: 1px solid #e5d7c1;
+        }
+        h1 {
+            font-size: 2.4rem;
+            font-weight: 650;
+            color: #0a2f44;
+            letter-spacing: -0.01em;
+            margin-bottom: 0.2rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h1 span {
+            background: #0a2f44;
+            color: #fef1d6;
+            font-size: 1rem;
+            padding: 0.2rem 1.2rem;
+            border-radius: 40px;
+            font-weight: 400;
+        }
+        .header-today {
+            background: #f5e6d4;
+            border-radius: 50px;
+            padding: 1.2rem 2rem;
+            margin: 1.2rem 0 2rem;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            border: 1px solid #dcc9b0;
+            box-shadow: inset 0 1px 4px #fff9ed;
+        }
+        .date-large {
+            font-size: 1.7rem;
+            font-weight: 600;
+            color: #0a2f44;
+            background: #fffcf3;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid #b9a78f;
+        }
+        .day-large {
+            font-size: 1.3rem;
+            background: #0a2f44;
+            color: #fef3dd;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        .quote-of-day {
+            font-style: italic;
+            color: #3b4f5e;
+            background: rgba(255, 250, 235, 0.8);
+            padding: 0.3rem 1.8rem;
+            border-radius: 40px;
+            font-size: 1.15rem;
+            border-left: 4px solid #0a2f44;
+            flex: 1 1 auto;
+            text-align: center;
+        }
+        .live-clock {
+            font-family: 'Courier New', monospace;
+            font-size: 1.5rem;
+            font-weight: 600;
+            background: #0a2f44;
+            color: #fef7e9;
+            padding: 0.3rem 1.5rem;
+            border-radius: 40px;
+            border: 1px solid #f3d7b5;
+            letter-spacing: 2px;
+            box-shadow: 0 2px 0 #031a26;
+        }
+
+        /* Form */
+        .form-section {
+            background: #fffbf2;
+            border-radius: 2rem;
+            padding: 2rem;
+            border: 1px solid #e2d2bb;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 8px 0 #dac8ae;
+        }
+        .form-section h3 {
+            color: #0a2f44;
+            margin-bottom: 1.5rem;
+            font-size: 1.6rem;
+            font-weight: 500;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.2rem 1.8rem;
+        }
+        .form-group {
+            margin-bottom: 0.8rem;
+        }
+        .form-group.full-width {
+            grid-column: span 2;
+        }
+        label {
+            font-weight: 600;
+            color: #0a2f44;
+            display: block;
+            margin-bottom: 0.35rem;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+        }
+        input, select {
+            background: white;
+            padding: 0.85rem 1.3rem;
+            border: 1px solid #cbb89e;
+            border-radius: 60px;
+            width: 100%;
+            font-size: 0.95rem;
+            outline: none;
+            transition: 0.15s;
+        }
+        input:focus, select:focus {
+            border-color: #0a2f44;
+            box-shadow: 0 0 0 3px rgba(10,47,68,0.15);
+        }
+        input[type="file"] {
+            padding: 0.6rem 1rem;
+            background: #fef7e9;
+        }
+        .btn {
+            background: #0a2f44;
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 0.9rem 2.4rem;
+            border-radius: 60px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid #0a2f44;
+            box-shadow: 0 4px 0 #05212e;
+        }
+        .btn:hover {
+            background: #154b66;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #05212e;
+        }
+        .btn-secondary {
+            background: #f5e6d4;
+            color: #0a2f44;
+            border: 1px solid #b9a78f;
+            box-shadow: 0 3px 0 #b9a78f;
+        }
+        .btn-secondary:hover {
+            background: #fcf0e0;
+            color: #0a2f44;
+        }
+
+        /* filter bar */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1.8rem 0 1.5rem;
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            background: #f5e6d4;
+            padding: 0.4rem 1.2rem 0.4rem 1.8rem;
+            border-radius: 60px;
+            border: 1px solid #dac29e;
+        }
+        .filter-group label {
+            margin-bottom: 0;
+            color: #0a2f44;
+            font-weight: 600;
+        }
+        .filter-group select {
+            width: 200px;
+            background: white;
+            border-radius: 40px;
+        }
+        .entries-title h2 {
+            font-size: 1.9rem;
+            color: #0a2f44;
+            font-weight: 450;
+        }
+
+        /* daftar entri */
+        .log-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .entry-card {
+            background: #fffcf5;
+            border-radius: 28px;
+            border: 1px solid #dbcbb4;
+            padding: 1.3rem 1.8rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            align-items: center;
+            box-shadow: 0 6px 0 #d2bea3;
+            transition: 0.1s;
+        }
+        .entry-thumb {
+            flex: 0 0 100px;
+            height: 100px;
+            border-radius: 20px;
+            background: #efe1cf;
+            overflow: hidden;
+            border: 2px solid #bba88c;
+        }
+        .entry-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .entry-info {
+            flex: 2;
+            min-width: 250px;
+        }
+        .entry-mata-kuliah {
+            background: #0a2f44;
+            color: #fef3dd;
+            padding: 0.3rem 1.4rem;
+            border-radius: 40px;
+            display: inline-block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            letter-spacing: 0.3px;
+            margin-bottom: 0.5rem;
+            border: 1px solid #153e55;
+        }
+        .entry-tanggal {
+            display: inline-block;
+            background: #dccfbe;
+            color: #1f3a4b;
+            padding: 0.2rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-left: 0.5rem;
+            border: 1px solid #b09f89;
+        }
+        .entry-catatan {
+            background: #f5e6d4;
+            padding: 0.7rem 1.4rem;
+            border-radius: 30px;
+            color: #1d2c3a;
+            font-size: 1rem;
+            border: 1px solid #dac4a8;
+            word-break: break-word;
+            margin-top: 0.5rem;
+        }
+        .delete-btn {
+            background: none;
+            border: 1.5px solid #b48c6c;
+            color: #7a4d2e;
+            font-size: 0.8rem;
+            padding: 0.4rem 1.4rem;
+            border-radius: 40px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: auto;
+            transition: 0.1s;
+        }
+        .delete-btn:hover {
+            background: #f3dbcb;
+            border-color: #a56942;
+            color: #4f2f1b;
+        }
+        .empty-message {
+            background: #f5e6d4;
+            border-radius: 80px;
+            padding: 2.2rem;
+            text-align: center;
+            color: #3a4f5e;
+            font-size: 1.3rem;
+            border: 2px dashed #bba78b;
+        }
+        .footer-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 2rem;
+            gap: 1rem;
+        }
+        /* backup section */
+        .backup-section {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-start;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        hr {
+            border: none;
+            border-top: 2px solid #ecdbba;
+            margin: 2rem 0 1rem;
+        }
+        /* clone pdf */
+        .pdf-clone-container {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            background: white;
+            padding: 1.8rem;
+            width: 800px;
+        }
+        .pdf-clone-container .entry-card {
+            page-break-inside: avoid;
+            border: 1px solid #0a2f44;
+            margin-bottom: 1.2rem;
+            background: #fefcf7;
+        }
+        .pdf-clone-container .entry-thumb {
+            flex: 0 0 180px;
+            height: 180px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>✋Halo Zan<span>📘 Logbuku + Tanggal</span></h1>
+
+    <!-- header hari ini + jam realtime -->
+    <div class="header-today" id="todayHeader"></div>
+
+    <!-- Form input -->
+    <div class="form-section">
+        <h3>➕ Tambah catatan baru</h3>
+        <div class="form-grid">
+            <div class="form-group">
+                <label>📸 Foto (maks 2MB)</label>
+                <input type="file" id="imageUpload" accept="image/*">
+            </div>
+            <div class="form-group">
+                <label>📚 Mata Kuliah</label>
+                <input type="text" id="matkulInput" placeholder="Misal: Pemrograman Web" list="matkulSuggest">
+                <datalist id="matkulSuggest"></datalist>
+            </div>
+            <!-- Tambahan input tanggal -->
+            <div class="form-group">
+                <label>📅 Tanggal</label>
+                <input type="date" id="dateInput">
+            </div>
+            <!-- Kolom kanan dibiarkan kosong agar grid rapi -->
+            <div class="form-group"></div>
+            <div class="form-group full-width">
+                <label>📝 Catatan</label>
+                <input type="text" id="description" placeholder="Apa yang dikerjakan...">
+            </div>
+        </div>
+        <button class="btn" id="submitBtn" style="margin-top: 0.8rem;">✓ Simpan ke Logbook</button>
+    </div>
+
+    <!-- Filter -->
+    <div class="filter-bar">
+        <div class="entries-title">
+            <h2>📋 Arsip logbook</h2>
+        </div>
+        <div class="filter-group">
+            <label for="filterMatkul">Filter :</label>
+            <select id="filterMatkul">
+                <option value="SEMUA">Semua Mata Kuliah</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- Daftar entri -->
+    <div id="entriesContainer" class="log-list"></div>
+
+    <!-- Tombol ekspor PDF & backup -->
+    <div class="footer-actions">
+        <button class="btn btn-secondary" id="exportPdfBtn">📄 Ekspor ke PDF</button>
+    </div>
+
+    <!-- Backup manual section -->
+    <div class="backup-section">
+        <button class="btn btn-secondary" id="backupBtn">💾 Backup ke File (JSON)</button>
+        <input type="file" id="restoreFile" accept=".json" style="display:none;">
+        <button class="btn btn-secondary" id="restoreBtn">📂 Pulihkan dari File</button>
+    </div>
+
+    <hr>
+    <div style="text-align: right; color: #5b6d7c;">Data tersimpan di localStorage + backup manual</div>
+</div>
+
+<script>
+(function() {
+    // ---------- KUMPULAN QUOTE ----------
+    const QUOTES = [
+        "Hari ini adalah kanvas, lukislah yang indah.",
+        "Jangan menunggu motivasi, ciptakan itu.",
+        "Satu langkah kecil lebih baik dari seribu rencana.",
+        "Kesempatan datang pada mereka yang bergerak.",
+        "Fokus pada hal yang bisa kau kendalikan.",
+        "Bersyukur membuka pintu kebahagiaan.",
+        "Hidup tidak tentang menunggu badai berlalu.",
+        "Kebaikan kecil hari ini, dampak besar nanti.",
+        "Jadikan hari ini berarti bagi orang lain.",
+        "Pikiran positif melahirkan energi positif.",
+        "Kerja keras tanpa henti akan terbayar.",
+        "Nikmati prosesnya, hasilnya bonus.",
+        "Hari ini lebih baik dari kemarin.",
+        "Senyum adalah sedekah paling mudah.",
+        "Ide hebat dimulai dari catatan kecil.",
+        "Istirahat sejenak, lalu lanjutkan.",
+        "Percayalah pada proses yang sedang berjalan.",
+        "Konsistensi mengalahkan intensitas.",
+        "Berani mencoba adalah setengah keberhasilan.",
+        "Hari ini adalah hadiah, itu sebabnya disebut present."
+    ];
+
+    function getDailyQuote(dateStr) {
+        let hash = 0;
+        for (let i = 0; i < dateStr.length; i++) hash = ((hash << 5) - hash) + dateStr.charCodeAt(i);
+        return QUOTES[Math.abs(hash) % QUOTES.length];
+    }
+
+    // ---------- UTIL TANGGAL ----------
+    function getCurrentDateStr() {
+        const d = new Date();
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function getDayName(dateStr) {
+        const [y,m,d] = dateStr.split('-').map(Number);
+        return new Date(y, m-1, d).toLocaleDateString('id-ID', { weekday:'long' });
+    }
+    function formatTanggalIndonesia(dateStr) {
+        const [y,m,d] = dateStr.split('-').map(Number);
+        return new Date(y, m-1, d).toLocaleDateString('id-ID', { day:'numeric', month:'long', year:'numeric' });
+    }
+
+    // ---------- LOCALSTORAGE ----------
+    const STORAGE_KEY = 'logbookEntriesWithMatkul';
+    let entries = loadEntries();
+
+    function loadEntries() {
+        try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; } 
+        catch { return []; }
+    }
+    function saveEntries() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    // ---------- RENDER HEADER (dengan jam realtime) ----------
+    function renderTodayHeader() {
+        const today = getCurrentDateStr();
+        const dayName = getDayName(today);
+        const quote = getDailyQuote(today);
+        const formatted = formatTanggalIndonesia(today);
+        document.getElementById('todayHeader').innerHTML = `
+            <span class="date-large">${formatted}</span>
+            <span class="day-large">${dayName}</span>
+            <span class="quote-of-day">“${quote}”</span>
+            <span class="live-clock" id="liveClock">--:--:--</span>
+        `;
+    }
+
+    // ---------- JAM REALTIME ----------
+    function updateClock() {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('id-ID', { hour12: false });
+        const liveClock = document.getElementById('liveClock');
+        if (liveClock) liveClock.textContent = timeStr;
+    }
+    setInterval(updateClock, 1000);
+
+    // ---------- FILTER ----------
+    let currentFilter = 'SEMUA';
+
+    function rebuildFilterOptions() {
+        const matkulSet = new Set(entries.map(e => e.matkul).filter(Boolean));
+        const select = document.getElementById('filterMatkul');
+        const currentVal = select.value;
+        select.innerHTML = '<option value="SEMUA">Semua Mata Kuliah</option>';
+        [...matkulSet].sort().forEach(mk => {
+            const option = document.createElement('option');
+            option.value = mk;
+            option.textContent = mk;
+            select.appendChild(option);
+        });
+        if ([...matkulSet].includes(currentVal)) select.value = currentVal;
+        else select.value = 'SEMUA';
+        currentFilter = select.value;
+    }
+
+    function getFilteredEntries() {
+        if (currentFilter === 'SEMUA') return [...entries];
+        return entries.filter(e => e.matkul === currentFilter);
+    }
+
+    // ---------- RENDER ENTRI (menampilkan TANGGAL, bukan jam) ----------
+    function renderEntries() {
+        const container = document.getElementById('entriesContainer');
+        const filtered = getFilteredEntries();
+        if (filtered.length === 0) {
+            container.innerHTML = `<div class="empty-message">📭 Tidak ada catatan untuk filter ini.</div>`;
+            return;
+        }
+        const sorted = [...filtered].reverse();
+        let html = '';
+        sorted.forEach(entry => {
+            const originalIndex = entries.findIndex(e => 
+                e.date === entry.date && e.matkul === entry.matkul && e.description === entry.description && e.imageData === entry.imageData
+            );
+            // Format tanggal untuk ditampilkan
+            const tanggalFormatted = formatTanggalIndonesia(entry.date);
+            const dayName = entry.day || getDayName(entry.date); // fallback jika data lama tidak punya day
+            html += `
+                <div class="entry-card" data-original-index="${originalIndex}">
+                    <div class="entry-thumb">
+                        <img src="${entry.imageData || 'data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22100%22%20height%3D%22100%22%20viewBox%3D%220%200%20100%20100%22%3E%3Crect%20width%3D%22100%22%20height%3D%22100%22%20fill%3D%22%23d3dae3%22%2F%3E%3Ctext%20x%3D%2210%22%20y%3D%2255%22%20font-family%3D%22Arial%22%20font-size%3D%2212%22%20fill%3D%22%23333%22%3Eno image%3C%2Ftext%3E%3C%2Fsvg%3E'}" alt="foto">
+                    </div>
+                    <div class="entry-info">
+                        <div class="entry-mata-kuliah">📚 ${escapeHTML(entry.matkul || 'Tanpa matkul')}</div>
+                        <div class="entry-tanggal">📅 ${escapeHTML(tanggalFormatted)} · ${escapeHTML(dayName)}</div>
+                        <div class="entry-catatan">${escapeHTML(entry.description || '—')}</div>
+                    </div>
+                    <button class="delete-btn" onclick="hapusEntri(${originalIndex})">✕ Hapus</button>
+                </div>
+            `;
+        });
+        container.innerHTML = html;
+    }
+
+    function escapeHTML(str) {
+        return String(str).replace(/[&<>"]/g, function(m) {
+            if (m === '&') return '&amp;'; if (m === '<') return '&lt;'; if (m === '>') return '&gt;'; if (m === '"') return '&quot;';
+            return m;
+        });
+    }
+
+    window.hapusEntri = function(index) {
+        if (index >= 0 && index < entries.length) {
+            entries.splice(index, 1);
+            saveEntries();
+            rebuildFilterOptions();
+            renderEntries();
+        }
+    };
+
+    // ---------- TAMBAH ENTRI (dengan tanggal yang dipilih) ----------
+    function resizeImage(file, callback) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+                let width = img.width, height = img.height;
+                const maxDim = 1000;
+                if (width > height) {
+                    if (width > maxDim) { height *= maxDim / width; width = maxDim; }
+                } else {
+                    if (height > maxDim) { width *= maxDim / height; height = maxDim; }
+                }
+                const canvas = document.createElement('canvas');
+                canvas.width = width; canvas.height = height;
+                canvas.getContext('2d').drawImage(img, 0, 0, width, height);
+                callback(canvas.toDataURL('image/jpeg', 0.8));
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // Set default tanggal input ke hari ini
+    const dateInput = document.getElementById('dateInput');
+    dateInput.value = getCurrentDateStr();
+
+    document.getElementById('submitBtn').addEventListener('click', () => {
+        const fileInput = document.getElementById('imageUpload');
+        const matkul = document.getElementById('matkulInput').value.trim();
+        const desc = document.getElementById('description').value.trim();
+        const selectedDate = dateInput.value;
+
+        if (!fileInput.files || fileInput.files.length === 0) {
+            alert('Pilih foto terlebih dahulu.'); return;
+        }
+        if (!matkul) {
+            alert('Isi mata kuliah.'); return;
+        }
+        if (!selectedDate) {
+            alert('Pilih tanggal.'); return;
+        }
+        const file = fileInput.files[0];
+        if (file.size > 2 * 1024 * 1024) {
+            alert('Ukuran maksimal 2MB.'); return;
+        }
+
+        // Gunakan tanggal yang dipilih
+        const dayName = getDayName(selectedDate);
+        const quote = getDailyQuote(selectedDate);
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('id-ID', { hour12: false });
+
+        resizeImage(file, (dataURL) => {
+            const newEntry = {
+                date: selectedDate,
+                day: dayName,
+                quote: quote,
+                time: timeStr,               // tetap disimpan untuk keperluan lain
+                matkul: matkul,
+                description: desc,
+                imageData: dataURL
+            };
+            entries.push(newEntry);
+            saveEntries();
+            rebuildFilterOptions();
+            document.getElementById('filterMatkul').value = 'SEMUA';
+            currentFilter = 'SEMUA';
+            renderEntries();
+            updateMatkulSuggest();
+
+            // Reset form
+            fileInput.value = '';
+            document.getElementById('matkulInput').value = '';
+            document.getElementById('description').value = '';
+            // Kembalikan tanggal ke hari ini (opsional, bisa juga biarkan sesuai pilihan terakhir)
+            dateInput.value = getCurrentDateStr();
+        });
+    });
+
+    function updateMatkulSuggest() {
+        const matkulSet = [...new Set(entries.map(e => e.matkul).filter(Boolean))];
+        const datalist = document.getElementById('matkulSuggest');
+        datalist.innerHTML = matkulSet.map(m => `<option value="${escapeHTML(m)}">`).join('');
+    }
+
+    document.getElementById('filterMatkul').addEventListener('change', function(e) {
+        currentFilter = e.target.value;
+        renderEntries();
+    });
+
+    // ---------- EKSPOR PDF (opsional: masih menampilkan jam) ----------
+    document.getElementById('exportPdfBtn').addEventListener('click', function() {
+        if (entries.length === 0) {
+            alert('Tidak ada entri untuk diekspor.'); return;
+        }
+
+        const cloneContainer = document.createElement('div');
+        cloneContainer.className = 'pdf-clone-container';
+        const today = getCurrentDateStr();
+        const headerClone = document.createElement('h2');
+        headerClone.style.color = '#0a2f44';
+        headerClone.style.marginBottom = '1.5rem';
+        headerClone.style.borderBottom = '2px solid #0a2f44';
+        headerClone.style.paddingBottom = '0.5rem';
+        headerClone.innerHTML = `📘 Logbook lengkap (${formatTanggalIndonesia(today)})`;
+        cloneContainer.appendChild(headerClone);
+
+        [...entries].reverse().forEach(entry => {
+            const card = document.createElement('div');
+            card.style.display = 'flex';
+            card.style.gap = '2rem';
+            card.style.alignItems = 'flex-start';
+            card.style.border = '1px solid #0a2f44';
+            card.style.borderRadius = '24px';
+            card.style.padding = '1.8rem';
+            card.style.marginBottom = '1.5rem';
+            card.style.backgroundColor = '#fefaf2';
+            const thumb = document.createElement('div');
+            thumb.style.flex = '0 0 160px';
+            thumb.style.height = '160px';
+            thumb.style.borderRadius = '20px';
+            thumb.style.overflow = 'hidden';
+            thumb.style.border = '1px solid #b9a78f';
+            const img = document.createElement('img');
+            img.src = entry.imageData || '';
+            img.style.width = '100%'; img.style.height = '100%'; img.style.objectFit = 'contain';
+            thumb.appendChild(img);
+            const info = document.createElement('div');
+            info.style.flex = '1';
+            info.innerHTML = `
+                <div style="background:#0a2f44; color:#fef3dd; padding:0.3rem 1.5rem; border-radius:40px; display:inline-block; margin-bottom:0.8rem; font-weight:bold;">
+                    📚 ${escapeHTML(entry.matkul || 'Tanpa matkul')} · 🕒 ${entry.time || '—'}
+                </div>
+                <div style="margin:0.6rem 0; font-size:1.05rem;"><span style="background:#f5e6d4; padding:0.2rem 1.2rem; border-radius:30px;">📅 ${formatTanggalIndonesia(entry.date)} · ${entry.day}</span></div>
+                <div style="font-style:italic; color:#3b4f5e; background:#fcf3e7; padding:0.3rem 1.5rem; border-radius:30px; margin:0.5rem 0;">“${escapeHTML(entry.quote)}”</div>
+                <div style="background:#e6dfd3; padding:0.6rem 1.5rem; border-radius:30px; margin-top:0.5rem;">📝 ${escapeHTML(entry.description || '—')}</div>
+            `;
+            card.appendChild(thumb); card.appendChild(info);
+            cloneContainer.appendChild(card);
+        });
+
+        document.body.appendChild(cloneContainer);
+
+        const opt = {
+            margin: [0.6, 0.6, 0.6, 0.6],
+            filename: `logbook_${getCurrentDateStr()}.pdf`,
+            image: { type: 'jpeg', quality: 0.9 },
+            html2canvas: { scale: 2, useCORS: true },
+            jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+        };
+        html2pdf().from(cloneContainer).set(opt).save().then(() => {
+            document.body.removeChild(cloneContainer);
+        }).catch(e => {
+            alert('Gagal PDF: ' + e);
+            document.body.removeChild(cloneContainer);
+        });
+    });
+
+    // ---------- BACKUP MANUAL ----------
+    document.getElementById('backupBtn').addEventListener('click', function() {
+        const dataStr = JSON.stringify(entries, null, 2);
+        const blob = new Blob([dataStr], {type: 'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `logbook_backup_${getCurrentDateStr()}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    });
+
+    document.getElementById('restoreBtn').addEventListener('click', function() {
+        document.getElementById('restoreFile').click();
+    });
+
+    document.getElementById('restoreFile').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(ev) {
+            try {
+                const restoredEntries = JSON.parse(ev.target.result);
+                if (Array.isArray(restoredEntries)) {
+                    entries = restoredEntries;
+                    saveEntries();
+                    rebuildFilterOptions();
+                    updateMatkulSuggest();
+                    renderEntries();
+                    alert('✅ Data berhasil dipulihkan.');
+                } else {
+                    alert('❌ File backup tidak valid (bukan array).');
+                }
+            } catch (err) {
+                alert('❌ Gagal membaca file: ' + err);
+            }
+            e.target.value = '';
+        };
+        reader.readAsText(file);
+    });
+
+    // ---------- INIT ----------
+    renderTodayHeader();
+    updateClock();
+    rebuildFilterOptions();
+    updateMatkulSuggest();
+    renderEntries();
+})();
+</script>
+</body>
+</html>
